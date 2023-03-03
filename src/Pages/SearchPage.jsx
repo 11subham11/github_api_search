@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { fetchRepositories } from '../Actions/fetchRepositories';
 
 const SearchPageNew = () => {
@@ -6,7 +7,8 @@ const SearchPageNew = () => {
   const [sort, setSort] = useState('stars');
   const [perPage, setPerPage] = useState(10);
   const [page, setPage] = useState(1);
-  const [repositories, setRepositories] = useState([]);
+  const [repositories, setRepositories] = useState(null);
+  console.log(repositories);
 
   const [totalPages, setTotalPages] = useState(10);
 
@@ -20,6 +22,8 @@ const SearchPageNew = () => {
     }
    
   }, [searchQuery, sort, perPage, page]);
+
+  
 
    const handlePreviousPage = () => {
     setPage(page => Math.max(1, page - 1));
@@ -53,7 +57,7 @@ const SearchPageNew = () => {
       <ul>
         {repositories && repositories.map(repo => (
           <li key={repo.id}>
-            <a href={repo.html_url}>{repo.full_name}</a>
+            <Link to={`repos/${repo.id}`}>{repo.full_name}</Link>
             <div>{repo.description}</div>
             <div>{repo.stargazers_count} stars</div>
             <div>{repo.watchers_count} watchers</div>
