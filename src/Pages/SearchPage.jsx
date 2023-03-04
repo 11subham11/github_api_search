@@ -4,10 +4,10 @@ import { fetchRepositories } from "../Actions/fetchRepositories";
 import { BiSearchAlt, BiGitRepoForked } from "react-icons/bi";
 import { AiOutlineStar } from "react-icons/ai";
 import { GrFormView } from "react-icons/gr";
-import {CgExport} from 'react-icons/cg'
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searching, setSearching] = useState(false);
   const [sort, setSort] = useState("stars");
   const [perPage, setPerPage] = useState(10);
   const [page, setPage] = useState(1);
@@ -19,8 +19,11 @@ const SearchPage = () => {
   useEffect(() => {
     // fetch repository data when search query, sort, per page, or page changes
     if (searchQuery !== "") {
+      setRepositories(null)
+      setSearching(true);
       fetchRepositories(searchQuery, sort, perPage, page).then((data) => {
         setRepositories(data.items);
+        setSearching(false);
       });
     }
   }, [searchQuery, sort, perPage, page]);
@@ -33,10 +36,10 @@ const SearchPage = () => {
     setPage((page) => Math.min(totalPages, page + 1));
   };
 
-  const handlePageChange = (e) => {
-    const newPage = parseInt(e.target.value);
-    setPage(newPage);
-  };
+  // const handlePageChange = (e) => {
+  //   const newPage = parseInt(e.target.value);
+  //   setPage(newPage);
+  // };
 
   // render search form and search results
   return (
@@ -97,6 +100,7 @@ const SearchPage = () => {
           </div>
         </form>
       </div>
+
       {repositories ? (
         <div className="w-full px-20 py-10">
           <h1 className="text-center mb-6 text-2xl font-extrabold text-gray-300">
@@ -134,11 +138,20 @@ const SearchPage = () => {
                   {repo.description}
                 </p>
                 <div className="absolute top-10 right-10">
-                  <Link to={`repos/${repo.id}`} className='bg-green-600 p-2 rounded text-gray-200 hover:bg-green-800'>Details</Link>
+                  <Link
+                    to={`repos/${repo.id}`}
+                    className="bg-green-600 p-2 rounded text-gray-200 hover:bg-green-800"
+                  >
+                    Details
+                  </Link>
                 </div>
               </li>
             ))}
           </ul>
+        </div>
+      ) : searching ? (
+        <div className="mt-40 flex items-center justify-center h-full ">
+          <p className="text-2xl">Searching...</p>
         </div>
       ) : (
         <div className="mt-40 flex items-center justify-center h-full ">
@@ -149,17 +162,29 @@ const SearchPage = () => {
       )}
 
       {repositories && (
-        <div>
-          <button onClick={handlePreviousPage} disabled={page === 1}>
+        <div className="flex items-center justify-center mb-20 gap-2">
+          <button
+            className="bg-blue-600 px-2 py-1 rounded"
+            onClick={handlePreviousPage}
+            disabled={page === 1}
+          >
             Previous
           </button>
           <span>
             Page {page} of {totalPages}
           </span>
-          <button onClick={handleNextPage} disabled={page === totalPages}>
+          <button
+            className="bg-blue-600 px-2 py-1 rounded"
+            onClick={handleNextPage}
+            disabled={page === totalPages}
+          >
             Next
           </button>
-          <select value={page} onChange={handlePageChange}>
+          {/* <select
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+            value={page}
+            onChange={handlePageChange}
+          >
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(
               (pageNum) => (
                 <option value={pageNum} key={pageNum}>
@@ -167,7 +192,7 @@ const SearchPage = () => {
                 </option>
               )
             )}
-          </select>
+          </select> */}
         </div>
       )}
     </>
